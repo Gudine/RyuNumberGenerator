@@ -156,11 +156,13 @@ body {
     font-family: 'Arial Black';
     font-size: 40pt;
     text-align: center;
+    margin: 0px;
 }
 .topRow > h2 {
     font-family: 'Arial Black';
     font-size: 20pt;
     text-align: center;
+    margin: 0px;
 }
 
 .middleRow {
