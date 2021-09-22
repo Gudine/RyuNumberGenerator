@@ -46,9 +46,6 @@ function dropHandler(ev) {
     if (ev.dataTransfer.items[0].kind === 'file') {
       file = ev.dataTransfer.items[0].getAsFile();
     }
-    else if (ev.dataTransfer.items[0].kind === 'string') {
-      ev.dataTransfer.items[0].getAsString(function (s){file = imageLoader(s)})
-    }
   } else {
     // Use DataTransfer interface to access the file(s)
     for (var i = 0; i < ev.dataTransfer.files.length; i++) {
