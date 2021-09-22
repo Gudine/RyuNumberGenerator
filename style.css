@@ -4,7 +4,7 @@ body {
     justify-content:center;
     align-items:center;
     grid-auto-flow: column;
-    grid-template-rows: 100px 700px 50fr;
+    grid-template-rows: 150px 700px 100fr;
     grid-template-columns: 100fr;
     height:100vh;
 }
@@ -145,9 +145,21 @@ body {
     left: -1px;
 }
 
+.topRow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 100%;
+}
 .topRow > h1 {
     font-family: 'Arial Black';
     font-size: 40pt;
+    text-align: center;
+}
+.topRow > h2 {
+    font-family: 'Arial Black';
+    font-size: 20pt;
     text-align: center;
 }
 
