@@ -1,18 +1,3 @@
-
-//=========================================================================================================
-//Disable pasting style on editable names
-var ce = document.querySelectorAll('[contenteditable]');
-
-ce.forEach(contentNoStyle);
-
-function contentNoStyle(value) {
-  value.addEventListener('paste', function (e) {
-    e.preventDefault()
-    var text = e.clipboardData.getData('text/plain')
-    document.execCommand('insertText', false, text)
-  })
-};
-
 //=========================================================================================================
 //Simple image loader function
 function imageLoader(value) {
@@ -20,9 +5,6 @@ function imageLoader(value) {
     .then(res => res.blob()) // Gets the response and returns it as a blob
     .then(blob => {return blob});
 }
-
-//=========================================================================================================
-//Importing default images (remove later)
 
 //=========================================================================================================
 //Importing image to circle through drag and drop
@@ -72,15 +54,7 @@ function cropperOn(file, elem) {
       autoCropArea: 1,
       wheelZoomRatio: 0.2,
       toggleDragModeOnDblclick: false,
-      crop(event) {
-        console.log(event.detail.x);
-        console.log(event.detail.y);
-        console.log(event.detail.width);
-        console.log(event.detail.height);
-        console.log(event.detail.rotate);
-        console.log(event.detail.scaleX);
-        console.log(event.detail.scaleY);
-      },
+      crop(event) {},
       ready() {
         document.querySelector(".cropContainer > button").addEventListener("click", cropperDone);
       }
@@ -173,8 +147,6 @@ function createColumn(number) {
   return template.children;
 }
 
-//console.log(createColumn(2));
-
 //=========================================================================================================
 //Adding or removing circles
 var circleAmount = 0;
@@ -188,7 +160,6 @@ function addColumn() {
   
   for (let i = 0; i < output.length;) {
     container.appendChild(output[i]);
-    console.log(output);
   }
 }
 
@@ -224,3 +195,15 @@ document.querySelector(".mainContainer").addEventListener('focusout', function (
     textReset(e);
   }
 });
+
+document.querySelector(".mainContainer").addEventListener('paste', function (e) {
+  if (e.target.hasAttribute("contenteditable")) {
+    contentNoStyle(e);
+  }
+});
+
+function contentNoStyle(e) {
+  e.preventDefault()
+  var text = e.clipboardData.getData('text/plain')
+  document.execCommand('insertText', false, text)
+};
