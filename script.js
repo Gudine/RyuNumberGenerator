@@ -1,3 +1,5 @@
+const regBGImage = /url\(([^\)]*)\), url\(([^\)]*)\), url\(([^\)]*)\)/
+
 //=========================================================================================================
 //Simple image loader function
 function imageLoader(value) {
@@ -14,14 +16,38 @@ function dragOverHandler(ev) {
 
   // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
+  
+  ev.target.classList.remove("dragLeave");
+  ev.target.classList.add("dragOver");
+}
+function dragLeaveHandler(ev) {
+  console.log('File(s) left drop zone');
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+  
+  ev.target.classList.remove("dragOver");
+  ev.target.classList.add("dragLeave");
 }
 
 function dropHandler(ev) {
   console.log('File(s) dropped');
   var file;
+  var side;
+  
   // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
-
+  
+  ev.target.classList.remove("dragOver");
+  ev.target.classList.add("dragLeave");
+  setTimeout(function(){ev.target.classList.remove("dragLeave");}, 300);
+  
+  //Check on which part of the circle the file was dragged into
+  if (ev.offsetX < ev.target.clientWidth/3) side = 'left'
+  else if (ev.offsetX > ((ev.target.clientWidth/3)*2)) side = 'right';
+  else side = 'center';
+  
+  //console.log(side);
   if (ev.dataTransfer.items) {
     // Use DataTransferItemList interface to access the file(s)
     // If dropped items aren't files, reject them
@@ -37,17 +63,43 @@ function dropHandler(ev) {
   if (file) {
     file = URL.createObjectURL(file)
     //document.querySelector("#drop").style.backgroundImage = "url('" + file + "')";
-    cropperOn(file, ev.target);
+    cropperOn(file, ev.target, side);
   }
 }
 
-function cropperOn(file, elem) {
+function addCircleImage(canvas, elem, side) {
+  console.log(canvas, elem, side);
+  if (side == 'center') {
+    elem.classList.add("single");
+    elem.style.backgroundImage = "url('assets/black.png'), url('" + canvas + "')";
+  }
+  else {
+    elem.classList.remove("single");
+    let regExResult = elem.style.backgroundImage.match(regBGImage);
+    if (regExResult == null) {regExResult = ["", "assets/black.png", "", ""];}
+    
+    if (side == 'left') {
+      elem.style.backgroundImage = "url(" + regExResult[1] + "), url(" + canvas + "), url(" + regExResult[3] + ")";
+      console.log(elem.style.backgroundImage);
+    }
+    else if (side == 'right') {
+      elem.style.backgroundImage = "url(" + regExResult[1] + "), url(" + regExResult[2] + "), url(" + canvas + ")";
+    }
+  }
+}
+
+function cropperOn(file, elem, side) {
     document.querySelector("#cropperImage").src = file;
     document.querySelector(".imageCropContainer").style.display = "flex";
     
     let image = document.getElementById('cropperImage');
+    let aspect;
+    
+    if (side == 'center') aspect = 1/1;
+    else aspect = 1/2;
+    
     let cropper = new Cropper(image, {
-      aspectRatio: 1/1,
+      aspectRatio: aspect,
       viewMode: 1,
       dragMode: 'move',
       guides: false,
@@ -57,12 +109,17 @@ function cropperOn(file, elem) {
       crop(event) {},
       ready() {
         document.querySelector(".cropContainer > button").addEventListener("click", cropperDone);
+        
+        let cropperElems = document.querySelectorAll(".cropper-view-box, .cropper-face");
+        for (let i = 0; i < cropperElems.length; i++) {
+          cropperElems[i].classList.add(side);
+        }
       }
     });
 
     function cropperDone(ev) {
       let result = cropper.getCroppedCanvas();
-      result.toBlob(function (canvas){elem.style.backgroundImage = "url('" + URL.createObjectURL(canvas) + "')"});
+      result.toBlob(function (canvas){ addCircleImage(URL.createObjectURL(canvas), elem, side);});
       
       document.querySelector(".imageCropContainer").style.display = "none";
       document.querySelector(".cropContainer > button").removeEventListener("click", cropperDone);
@@ -127,6 +184,7 @@ columnTemplate.children[3].appendChild(document.createTextNode("Name"));
 
 columnTemplate.children[4].addEventListener('drop', dropHandler);
 columnTemplate.children[4].addEventListener('dragover', dragOverHandler);
+columnTemplate.children[4].style.backgroundImage = "url(assets/black.png), url(), url()";
 
 function createColumn(number) {
   let template = columnTemplate.cloneNode(true);
@@ -187,6 +245,12 @@ document.querySelector(".mainContainer").addEventListener('drop', function (e) {
 document.querySelector(".mainContainer").addEventListener('dragover', function (e) {
   if (e.target.classList.contains("circle") && e.target.id != "ryu") {
     dragOverHandler(e);
+  }
+});
+
+document.querySelector(".mainContainer").addEventListener('dragleave', function (e) {
+  if (e.target.classList.contains("circle") && e.target.id != "ryu") {
+    dragLeaveHandler(e);
   }
 });
 
